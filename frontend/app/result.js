@@ -1,20 +1,39 @@
+import React from 'react';
+import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { View, Text, Image, StyleSheet } from 'react-native';
 
 export default function Result() {
-  const { image } = useLocalSearchParams();
-
+  const { image, detections } = useLocalSearchParams();
+  const detectedObjects = JSON.parse(detections || '[]');
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Disease Detection Result</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Detection Results</Text>
       {image && <Image source={{ uri: image }} style={styles.image} />}
-      <Text>Processing...</Text>
-    </View>
+      {detectedObjects.length > 0 ? (
+        detectedObjects.map((det, index) => {
+          const [x1, y1, x2, y2] = det.bounding_box; // Extract coordinates
+
+          return (
+            <View key={index} style={styles.resultBox}>
+              <Text>Label: {det.label}</Text>
+              <Text>Confidence: {det.confidence}</Text>
+              <Text>
+                Bounding Box: ({x1}, {y1}), ({x2}, {y2})
+              </Text> 
+            </View>
+          );
+        })
+      ) : (
+        <Text style={styles.noDetection}>No dog detected.</Text>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 20, marginBottom: 20 },
+  container: { flexGrow: 1, alignItems: 'center', padding: 20, backgroundColor: '#E3F2FD' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   image: { width: 300, height: 300, marginBottom: 20 },
+  resultBox: { width: '90%', padding: 10, backgroundColor: '#FFF', borderRadius: 10, marginBottom: 10 },
+  noDetection: { fontSize: 18, color: 'red', marginTop: 20 },
 });

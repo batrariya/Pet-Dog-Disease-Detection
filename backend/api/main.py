@@ -25,10 +25,10 @@ from utils.augmentations import letterbox  # ✅ Import from utils.augmentations
 app = FastAPI()
 
 # Enable CORS for frontend
-origins = ["http://localhost", "http://localhost:3000"]
+# origins = ["http://localhost", "http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -85,5 +85,6 @@ async def detect_dog(file: UploadFile = File(...)):
 
     return {"detections": detections}
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+
+# if __name__ == "__main__":
+    # uvicorn.run(app, host="0.0.0.0", port=8000, reload = True)
