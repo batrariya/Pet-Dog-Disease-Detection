@@ -58,7 +58,7 @@ export default function Home() {
     });
 
     try {
-      const response = await axios.post('http://172.20.9.114:8000/detect', formData, {
+      const response = await axios.post('http://172.20.75.58:8000/detect', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
