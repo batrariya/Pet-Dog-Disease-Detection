@@ -21,27 +21,6 @@ export default function Home() {
     }
   };
 
-  // const pickImage = async () => {
-  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (status !== "granted") {
-  //     Alert.alert("Permission Denied", "You need to allow access to photos.");
-  //     return;
-  //   }
-  
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: true,
-  //     quality: 1,
-  //   });
-  
-  //   if (!result.canceled) {
-  //     const selectedImageUri = result.assets[0].uri;
-  //     console.log("Selected Image URI:", selectedImageUri); // ✅ LOG THE IMAGE URI
-  //     setImage(selectedImageUri);
-  //   }
-  // };
-  
-
   const detectDog = async () => {
     if (!image) {
       Alert.alert("Error", "Please select an image first.");
@@ -58,15 +37,15 @@ export default function Home() {
     });
 
     try {
-      const response = await axios.post('http://192.168.31.234:8000/detect', formData, {
+      const response = await axios.post('http://172.20.72.174:8000/detect', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      const { detections } = response.data;
+      const { detections, image_url } = response.data;  // ✅ Get annotated image URL
 
       router.push({
         pathname: '/result',
-        params: { image, detections: JSON.stringify(detections) },
+        params: { image_url, detections: JSON.stringify(detections) }, // ✅ Pass annotated image
       });
     } catch (error) {
       console.error("Detection failed:", error);
@@ -75,44 +54,6 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-
-  // const detectDog = async () => {
-  //   if (!image) {
-  //     Alert.alert("Error", "Please select an image first.");
-  //     return;
-  //   }
-  
-  //   setIsLoading(true);
-  
-  //   try {
-  //     // Fetch the image as a Blob
-  //     const response = await fetch(image);
-  //     const blob = await response.blob();
-  
-  //     const formData = new FormData();
-  //     formData.append('file', {
-  //       uri: image,
-  //       name: 'dog.jpg',
-  //       type: blob.type,  // Dynamically set the correct MIME type
-  //     });
-  
-  //     const result = await axios.post('http://172.20.9.114:8000/detect', formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //     });
-  
-  //     const { detections } = result.data;
-  
-  //     router.push({
-  //       pathname: '/result',
-  //       params: { image, detections: JSON.stringify(detections) },
-  //     });
-  //   } catch (error) {
-  //     console.error("Detection failed:", error);
-  //     Alert.alert("Error", "Failed to detect dog. Check server connection.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };  
 
   return (
     <View style={styles.container}>

@@ -1,13 +1,19 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import numpy as np
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageDraw
 import torch
 import sys
 import os
 import pathlib
+import uuid  # Import for unique filenames
+
+# Force pathlib to use PosixPath instead of WindowsPath
+if os.name != "nt":  
+    pathlib.WindowsPath = pathlib.PosixPath  
 
 temp = pathlib.PosixPath
 pathlib.PosixPath = pathlib.WindowsPath
@@ -25,7 +31,6 @@ from utils.augmentations import letterbox  # ✅ Import from utils.augmentations
 app = FastAPI()
 
 # Enable CORS for frontend
-# origins = ["http://localhost", "http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,6 +38,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static directory to serve images
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ✅ Load YOLOv5 Model from Local Repository
 MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../model/best.pt"))  # ✅ Fixed model path
@@ -52,12 +60,12 @@ def read_file_as_image(data) -> Image.Image:
 
 @app.post("/detect")
 async def detect_dog(file: UploadFile = File(...)):
-    """Process the uploaded image and detect dogs"""
+    """Process the uploaded image, detect dogs, and return the annotated image"""
     image = read_file_as_image(await file.read())
 
-    # Preprocess image for YOLOv5
+    # Convert PIL image to numpy array
     img = np.array(image)
-    img_resized, ratio, (dw, dh) = letterbox(img, 640, stride=32, auto=True)  # ✅ Updated
+    img_resized, ratio, (dw, dh) = letterbox(img, 640, stride=32, auto=True)
 
     img_resized = np.transpose(img_resized, (2, 0, 1))  # HWC to CHW format
     img_resized = np.ascontiguousarray(img_resized)
@@ -75,16 +83,32 @@ async def detect_dog(file: UploadFile = File(...)):
     results = non_max_suppression(results, 0.4, 0.5)[0]  # Confidence threshold = 0.4, NMS = 0.5
 
     if results is not None and len(results) > 0:
+        draw = ImageDraw.Draw(image)  # Initialize drawer for PIL image
+
         for det in results:
             x1, y1, x2, y2, conf, cls = det.cpu().numpy()
+            x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])
             detections.append({
-                "bounding_box": [int(x1), int(y1), int(x2), int(y2)],  
+                "bounding_box": [x1, y1, x2, y2],
                 "confidence": round(float(conf), 2),
                 "label": "dog"
             })
 
-    return {"detections": detections}
+            # ✅ Draw bounding box
+            draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
+            draw.text((x1, y1 - 10), f"Dog {conf:.2f}", fill="red")
 
+    # ✅ Save the annotated image
+    os.makedirs("static", exist_ok=True)  # Ensure 'static' directory exists
+    unique_filename = f"annotated_{uuid.uuid4().hex}.jpg"
+    output_path = f"static/{unique_filename}"
+    image.save(output_path)
 
+    return {
+        "detections": detections,
+        "image_url": f"http://172.20.72.174:8000/static/{unique_filename}"
+    }
+
+# Run FastAPI
 # if __name__ == "__main__":
-    # uvicorn.run(app, host="0.0.0.0", port=8000, reload = True)
+#     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

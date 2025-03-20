@@ -6,3 +6,6 @@ python-multipart==0.0.9
 pillow==10.2.0
 matplotlib==3.8.3
 numpy==1.26.4
+torch
+torchvision
+torchaudio
