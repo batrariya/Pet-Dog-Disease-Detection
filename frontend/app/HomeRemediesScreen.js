@@ -67,13 +67,47 @@ const homeRemedies = {
     ],
     precautions: 'Ensure your dog gets enough rest and a stress-free environment, as stress can worsen the condition.',
   },
+
+  // ✅ Eye-related symptoms
+  Corneal_Edema: {
+    remedies: [
+      'Apply prescribed lubricating eye drops to reduce dryness.',
+      'Keep the eyes clean using a vet-recommended saline wash.',
+      'Avoid exposing your dog to strong light or wind.',
+      'Ensure your dog does not scratch its eyes by using a cone if needed.',
+    ],
+    precautions: 'Avoid trauma to the eyes and consult a vet if cloudiness or discomfort is noticed.',
+  },
+  Episcleral_Congestion: {
+    remedies: [
+      'Use cold compresses to reduce inflammation.',
+      'Ensure your pet rests in a low-stress environment.',
+      'Avoid exposure to allergens or irritants such as smoke.',
+    ],
+    precautions: 'Regular eye checkups and avoid dusty or polluted areas.',
+  },
+  Epiphora: {
+    remedies: [
+      'Gently wipe away tear stains with a damp cotton pad.',
+      'Keep the fur around the eyes trimmed and clean.',
+      'Use vet-recommended eye drops if advised.',
+    ],
+    precautions: 'Keep the eye area clean and dry. Identify and manage allergies if present.',
+  },
+  Cherry_Eye_Disease: {
+    remedies: [
+      'Apply warm compresses to reduce swelling temporarily.',
+      'Use vet-prescribed lubricants or anti-inflammatory drops.',
+    ],
+    precautions: 'Seek early veterinary intervention to avoid surgical complications. Prevent your dog from rubbing its eyes.',
+  },
 };
 
 export default function HomeRemediesScreen() {
   const { disease } = useLocalSearchParams();
 
   // Normalize disease name (replace spaces with underscores)
-  const formattedDisease = disease.replace(/\s+/g, '_');
+  const formattedDisease = disease ? disease.replace(/\s+/g, '_') : '';
 
   const remedyData = homeRemedies[formattedDisease] || {
     remedies: ['Consult a vet for specific guidance.'],

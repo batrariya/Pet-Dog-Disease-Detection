@@ -31,8 +31,8 @@ sys.path.append(YOLO_PATH)
 
 # IMAGE_SIZE = 320
 # ✅ Load UNet model
-# UNET_MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../model/gray_segmentation_mask_resaved.keras"))
-# unet_model = load_model(UNET_MODEL_PATH)
+UNET_MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../model/gray_segmentation_mask_resaved.keras"))
+unet_model = load_model(UNET_MODEL_PATH)
 
 # 🔹 Import YOLOv5 modules AFTER adding to sys.path
 from models.experimental import attempt_load  # Import YOLOv5 model loader
@@ -277,6 +277,132 @@ async def predict_skin_disease(file: UploadFile = File(...)):
 #         "segmentation_image_url": f"http://172.20.7.169:8000/static/{unique_segmentation_filename}",
 #         "disease_prediction": disease_prediction
 #     }
+
+# @app.post("/segment_and_predict")
+# async def segment_and_predict(file: UploadFile = File(...)):
+#     """
+#     Perform segmentation using the UNet model and predict the eye disease.
+#     """
+#     try:
+#         # Save uploaded file
+#         os.makedirs("uploads", exist_ok=True)
+#         unique_filename = f"eye_image_{uuid.uuid4().hex}.jpg"
+#         image_path = os.path.join("uploads", unique_filename)
+
+#         with open(image_path, "wb") as f:
+#             f.write(await file.read())
+
+#         # Run UNet-based segmentation and prediction logic
+#         result = predict_symptoms_from_image(image_path, unet_model)
+
+#         # Optional: Save mask as image for visualization
+#         mask_array = np.array(result["mask"], dtype=np.uint8)
+#         mask_colored = (mask_array * 60).astype(np.uint8)  # Visualize classes by intensity
+#         mask_image = Image.fromarray(mask_colored)
+
+#         os.makedirs("static", exist_ok=True)
+#         mask_filename = f"mask_{uuid.uuid4().hex}.png"
+#         mask_path = os.path.join("static", mask_filename)
+#         mask_image.save(mask_path)
+
+#         return {
+#             "predicted_disease": result["predicted_disease"],
+#             "mask_image_url": f"http://172.20.7.169:8000/static/{mask_filename}"
+#             # "detected_symptoms": result["symptom_confidences"]
+#         }
+
+#     except Exception as e:
+#         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.post("/segment_and_predict")
+async def segment_and_predict(file: UploadFile = File(...)):
+    """
+    Perform segmentation using the UNet model and predict the eye disease.
+    Returns detected symptoms, predicted disease, and mask visualization.
+    """
+    try:
+        # Save uploaded file
+        os.makedirs("uploads", exist_ok=True)
+        unique_filename = f"eye_image_{uuid.uuid4().hex}.jpg"
+        image_path = os.path.join("uploads", unique_filename)
+        IMAGE_SIZE = 320
+
+        with open(image_path, "wb") as f:
+            f.write(await file.read())
+
+        # 🔍 Your provided logic starts here
+        def clean_mask(mask):
+            kernel = np.ones((3, 3), np.uint8)
+            return cv2.morphologyEx(mask.astype(np.uint8), cv2.MORPH_CLOSE, kernel)
+
+        def apply_clahe(image):
+            lab = cv2.cvtColor(image, cv2.COLOR_RGB2LAB)
+            lab_planes = list(cv2.split(lab))
+            clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+            lab_planes[0] = clahe.apply(lab_planes[0])
+            lab = cv2.merge(lab_planes)
+            return cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
+
+        def predict_with_model(image_path, model):
+            img = cv2.imread(image_path)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
+            img_clahe = apply_clahe(img)
+            img_clahe = img_clahe / 255.0
+            pred = model.predict(np.expand_dims(img_clahe, axis=0))[0]
+            pred = tf.nn.softmax(pred, axis=-1).numpy()
+            return pred, img
+
+        def predict_symptoms_from_image(image_path, model, threshold=0.05):
+            symptoms = ["background", "Corneal Edema", "Episcleral Congestion", "Epiphora", "Cherry Eye Disease"]
+            pred, img = predict_with_model(image_path, model)
+            mask = np.argmax(pred, axis=-1)
+            mask = clean_mask(mask)
+
+            non_background_pixels = np.sum(mask != 0)
+            if non_background_pixels == 0:
+                return {
+                    "detected_symptoms": {},
+                    "predicted_disease": None,
+                    "mask": mask.tolist(),
+                }
+
+            detected_symptoms = {}
+            for class_idx in range(1, len(symptoms)):
+                pixel_count = np.sum(mask == class_idx)
+                percentage = pixel_count / non_background_pixels
+                if percentage > threshold:
+                    detected_symptoms[symptoms[class_idx]] = float(percentage)
+
+            predicted_disease = max(detected_symptoms, key=detected_symptoms.get) if detected_symptoms else None
+
+            return {
+                "predicted_disease": predicted_disease,
+                "mask": mask.tolist(),
+            }
+
+        # Run prediction
+        result = predict_symptoms_from_image(image_path, unet_model)
+
+        # Optional: Save mask as image
+        mask_array = np.array(result["mask"], dtype=np.uint8)
+        mask_colored = (mask_array * 60).astype(np.uint8)
+        mask_image = Image.fromarray(mask_colored)
+
+        os.makedirs("static", exist_ok=True)
+        mask_filename = f"mask_{uuid.uuid4().hex}.png"
+        mask_path = os.path.join("static", mask_filename)
+        mask_image.save(mask_path)
+
+        return {
+            "predicted_disease": result["predicted_disease"],
+            "mask_image_url": f"http://172.20.7.169:8000/static/{mask_filename}"
+        }
+
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
     
 # @app.post("/predict_symptoms")
 # async def predict_symptoms(file: UploadFile = File(...)):
