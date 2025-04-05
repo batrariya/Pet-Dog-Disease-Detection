@@ -37,7 +37,7 @@ export default function Home() {
     });
 
     try {
-      const response = await axios.post('http://172.20.72.174:8000/detect', formData, {
+      const response = await axios.post('http://172.20.7.169:8000/detect', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
@@ -60,7 +60,11 @@ export default function Home() {
       <Text style={styles.title}>Upload a Dog Image</Text>
       {image && <Image source={{ uri: image }} style={styles.image} />}
       <Button title="Choose Image" onPress={pickImage} />
-      {image && <Button title="Detect Dog" onPress={detectDog} disabled={isLoading} />}
+      {image && (
+      <View style={{ marginTop: 20 }}>
+        <Button title="Detect Dog" onPress={detectDog} disabled={isLoading} />
+      </View>
+      )}
     </View>
   );
 }

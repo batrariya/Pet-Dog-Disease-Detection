@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Button } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useNavigation } from '@react-navigation/native'; // Use navigation hook
 
 export default function Result() {
   const { image_url, detections } = useLocalSearchParams(); // ✅ Use annotated image URL
   const detectedObjects = JSON.parse(detections || '[]');
+  const navigation = useNavigation(); // Get navigation object
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -24,7 +27,7 @@ export default function Result() {
           ))}
 
           {/* Show Predict Disease button if dog is detected */}
-          <Button title="Predict Disease" onPress={() => console.log("Predict Disease clicked!")} />
+          <Button title="Predict Disease" onPress={() => navigation.navigate('DiseaseSelectionScreen')} />
         </>
       ) : (
         <Text style={styles.noDetection}>No dog detected.</Text>
