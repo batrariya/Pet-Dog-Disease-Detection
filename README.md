@@ -24,12 +24,12 @@ The system is designed for integration with a **React Native mobile app** (using
 
 ## Features
 
-- 📷 Upload an image of your dog.
-- 📍 YOLO-based bounding box detection of the dog in the image.
-- 🧠 Skin disease prediction using ResNet50 (high accuracy).
-- 👁️ Eye disease segmentation and classification using U-Net.
-- 🌐 FastAPI backend with image handling and prediction endpoints.
-- 📱 Mobile app interface built using React Native.
+- Upload an image of your dog.
+- YOLO-based bounding box detection of the dog in the image.
+- Skin disease prediction using ResNet50 (high accuracy).
+- Eye disease segmentation and classification using U-Net.
+- FastAPI backend with image handling and prediction endpoints.
+- Mobile app interface built using React Native.
 
 ## Tech Stack
 
