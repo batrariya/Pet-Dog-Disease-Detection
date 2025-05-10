@@ -10,9 +10,7 @@ This project provides an AI-powered system for detecting and classifying various
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
-- [Project Structure](#project-structure)
 - [Results](#results)
-- [License](#license)
 
 ## Overview
 
