@@ -84,7 +84,7 @@ The system is designed for integration with a **React Native mobile app** (using
 | `/predict_eye`   | POST   | Segments and predicts eye disease     |
 | `/upload`        | POST   | Uploads an image for processing       |
    
-## 📊 Results
+## Results
 
 - **Skin Disease Prediction Accuracy**: 96%
 - **Eye Disease Segmentation Dice Score**: 94%
