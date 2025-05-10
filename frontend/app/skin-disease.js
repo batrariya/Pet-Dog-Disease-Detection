@@ -70,7 +70,7 @@ export default function SkinDiseaseScreen() {
         type: 'image/jpeg',
       });
 
-      const response = await fetch('http://172.20.7.169:8000/predict_skin_disease', {
+      const response = await fetch('http://192.168.1.28:8000/predict_skin_disease', {
         method: 'POST',
         headers: { 'Content-Type': 'multipart/form-data' },
         body: formData,

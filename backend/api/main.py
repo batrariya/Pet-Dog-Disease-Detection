@@ -203,7 +203,7 @@ async def detect_dog(file: UploadFile = File(...)):
 
     return {
         "detections": detections,
-        "image_url": f"http://172.20.7.169:8000/static/{unique_filename}"
+        "image_url": f"http://192.168.1.28:8000/static/{unique_filename}"
     }
     
 # @app.post("/predict_skin_disease")
@@ -396,7 +396,7 @@ async def segment_and_predict(file: UploadFile = File(...)):
 
         return {
             "predicted_disease": result["predicted_disease"],
-            "mask_image_url": f"http://172.20.7.169:8000/static/{mask_filename}"
+            "mask_image_url": f"http://192.168.1.28:8000/static/{mask_filename}"
         }
 
     except Exception as e:

@@ -532,7 +532,7 @@ export default function EyeDiseaseScreen() {
         name: 'uploaded_image.jpg',
       });
 
-      const apiUrl = 'http://172.20.7.169:8000/segment_and_predict';
+      const apiUrl = 'http://192.168.1.28:8000/segment_and_predict';
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
