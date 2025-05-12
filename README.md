@@ -94,5 +94,5 @@ The system is designed for integration with a **React Native mobile app** (using
 
 - **Skin Disease Prediction Accuracy**: 96%
 - **Eye Disease Segmentation Dice Score**: 94%
-- **YOLOv5 Dog Detection mAP**: 89%
+- **YOLOv5 Dog Detection mAP**: 97.8%
 
