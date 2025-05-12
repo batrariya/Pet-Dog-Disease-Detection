@@ -86,9 +86,9 @@ The system is designed for integration with a **React Native mobile app** (using
 | Endpoint         | Method | Description                           |
 |------------------|--------|---------------------------------------|
 | `/ping`          | GET    | Health check of backend server        |
-| `/predict_skin`  | POST   | Predicts skin disease from image      |
-| `/predict_eye`   | POST   | Segments and predicts eye disease     |
-| `/upload`        | POST   | Uploads an image for processing       |
+| `/detect`        | POST   | Detects dogs in the uploaded image using the YOLOv5 model. Returns bounding box coordinates and confidence scores. The output image is annotated with bounding boxes and saved to the                               static/ folder with a UUID-based filename.     |
+| `/predict_skin_disease`   | POST   | Predicts skin disease from an uploaded image using a ResNet50 model. The image is preprocessed (resized and normalized), and the endpoint returns the predicted disease class along with the confidence score.     |
+| `/segment_and_predict`        | POST   | Segments and predicts eye disease using a UNet model. The uploaded eye image is processed to generate a segmentation mask, which is analyzed to identify symptoms. Returns the predicted disease and the segmentation mask image.      |
    
 ## Results
 
