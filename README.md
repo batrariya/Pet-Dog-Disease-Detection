@@ -48,25 +48,31 @@ The system is designed for integration with a **React Native mobile app** (using
 1. Clone the repository:
    ```bash
    git clone https://github.com/batrariya/Pet-Dog-Disease-Detection.git
-   cd Pet-Dog-Disease-Detection```
+   cd Pet-Dog-Disease-Detection
 2. Create a virtual environment and activate it:
-   ```python -m venv venv
-   source venv/bin/activate   # On Windows: .\venv\Scripts\activate```
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # On Windows: .\venv\Scripts\activate
 3. Install dependencies:
-   ```cd backend/api
-   pip install -r requirements.txt```
+   ```bash
+   cd backend/api
+   pip install -r requirements.txt
 4. Run the FastAPI server:
-   ```cd ..
-   uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload```
+   ```bash
+   cd ..
+   uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 
 ### Frontend
 
 1. Navigate to the frontend folder:
-   ```cd ../frontend```
-2. Install dependencies:
-   ```npm install```
-3. Start the Expo server:
-   ```npx expo start```
+   ```bash
+   cd ../frontend
+3. Install dependencies:
+   ```bash
+   npm install
+5. Start the Expo server:
+   ```bash
+   npx expo start
    
 ## Usage
 
